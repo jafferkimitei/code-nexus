@@ -17,11 +17,7 @@ body {
   margin-bottom: 20px;
 }
 
-h1 {
-  font-size: 2em;
-}
-
-main {
+.main-content {
   max-width: 800px;
   margin: 0 auto;
   padding: 20px;
@@ -30,7 +26,6 @@ main {
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-/* Form styles */
 .forms-container {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -42,6 +37,7 @@ main {
   display: flex;
   flex-direction: column;
   align-items: center;
+  margin-bottom: 20px;
 }
 
 .form h2 {
@@ -88,29 +84,17 @@ main {
   margin-top: 10px;
 }
 
-/* User statistics styles */
-.user-stats {
+.github-stats {
   margin-top: 20px;
-  text-align: left;
+  text-align: center;
 }
 
-.user-stats h2 {
-  font-size: 1.5em;
-  margin-bottom: 10px;
-}
-
-.user-stats p {
-  margin: 5px 0;
-}
-
-/* Repository list styles */
-.repositories {
+.github-trophies {
   margin-top: 20px;
 }
 
-.repositories h2 {
-  font-size: 1.5em;
-  margin-bottom: 10px;
+.github-repositories {
+  margin-top: 20px;
 }
 
 .repositories ul {
@@ -129,21 +113,4 @@ main {
 
 .repositories a:hover {
   text-decoration: underline;
-}
-
-/* GitHub statistics styles */
-.github-stats {
-  margin-top: 20px;
-  text-align: center;
-}
-
-.github-stats h2 {
-  font-size: 1.5em;
-  margin-bottom: 10px;
-}
-
-.github-stats img {
-  margin: 10px 0;
-  width: 100%;
-  max-width: 600px;
 }

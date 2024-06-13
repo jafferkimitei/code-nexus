@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './App.css';
 
 function App() {
@@ -11,8 +11,18 @@ function App() {
   const [releaseTag, setReleaseTag] = useState('');
   const [repositories, setRepositories] = useState([]);
   const [userStats, setUserStats] = useState(null);
+  const [trophies, setTrophies] = useState([]);
   const [message, setMessage] = useState('');
 
+  useEffect(() => {
+    if (username) {
+      fetchUserStats();
+      fetchRepositories();
+      fetchTrophies();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  
   const handleInputChange = (event) => {
     const { name, value } = event.target;
     if (name === 'username') setUsername(value);
@@ -40,6 +50,7 @@ function App() {
     event.preventDefault();
     fetchUserStats();
     fetchRepositories();
+    fetchTrophies();
   };
 
   const handleRepoSubmit = async (event) => {
@@ -66,6 +77,27 @@ function App() {
       setMessage('Error fetching user statistics');
     }
   };
+
+  const fetchTrophies = async () => {
+    try {
+      console.log('Fetching trophies for username:', username);
+      const response = await fetch(`https://github-contributions.vercel.app/api/trophies?username=${username}`);
+      console.log('Response:', response);
+  
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+  
+      const data = await response.json();
+      console.log('Data:', data);
+      setTrophies(data.trophies);
+    } catch (error) {
+      console.error('Error fetching trophies:', error);
+      setMessage('Error fetching trophies');
+    }
+  };
+  
+  
 
   const createRepository = async () => {
     try {
@@ -195,7 +227,7 @@ function App() {
         <h1>GitHub Tool</h1>
         <p>Manage your GitHub repositories</p>
       </header>
-      <main>
+      <main className='main-content'>
         <div className="forms-container">
           <form onSubmit={handleFormSubmit} className="form">
             <h2>Get Repositories</h2>
@@ -276,33 +308,46 @@ function App() {
         </div>
         {message && <p className="message">{message}</p>}
         {userStats && (
-          <div className="user-stats">
-            <h2>GitHub User Statistics</h2>
-            <p><strong>Username:</strong> {userStats.login}</p>
-            <p><strong>Name:</strong> {userStats.name}</p>
-            <p><strong>Public Repositories:</strong> {userStats.public_repos}</p>
-            <p><strong>Followers:</strong> {userStats.followers}</p>
-            <p><strong>Following:</strong> {userStats.following}</p>
-            <p><strong>Location:</strong> {userStats.location}</p>
-          </div>
-        )}
-        {repositories.length > 0 && (
-          <div className="repositories">
-            <h2>Repositories</h2>
-            <ul>
-              {repositories.map((repo) => (
-                <li key={repo.id}>
-                  <a href={repo.html_url} target="_blank" rel="noopener noreferrer">
-                    {repo.full_name}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-      </main>
-    </div>
-  );
-}
-
-export default App
+          <div className="github-stats">
+            <h2>GitHub Stats</h2>
+            <div className="github-stat-item">
+              <img src={`https://github-readme-stats.vercel.app/api?username=${username}&show_icons=true&theme=radical`} alt="GitHub Stats" />
+            </div>
+            <div className="github-stat-item">
+              <img src={`https://github-readme-stats.vercel.app/api/top-langs/?username=${username}&layout=compact&theme=radical`} alt="Github stats" />
+              </div>
+            </div>
+          )}
+          {trophies.length > 0 && (
+            <div className="github-trophies">
+              <h2>GitHub Trophies</h2>
+              <div className="github-trophy-list">
+                {trophies.map((trophy, index) => (
+                  <div key={index} className="github-trophy">
+                    <img src={trophy} alt={`Trophy ${index}`} />
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          {repositories.length > 0 && (
+            <div className="github-repositories">
+              <h2>Repositories</h2>
+              <ul className="repo-list">
+                {repositories.map((repo, index) => (
+                  <li key={index}>
+                    <a href={repo.html_url} target="_blank" rel="noopener noreferrer">
+                      {repo.name}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </main>
+      </div>
+    );
+  }
+  
+  export default App;
+  
