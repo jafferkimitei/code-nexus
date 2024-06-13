@@ -79,7 +79,7 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <h1>GitHub Tool</h1>
+        <h1>Code Nexus</h1>
         <p>Manage your GitHub repositories</p>
       </header>
       <main>
