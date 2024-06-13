@@ -5,6 +5,7 @@ function App() {
   const [username, setUsername] = useState('');
   const [token, setToken] = useState('');
   const [repoName, setRepoName] = useState('');
+  const [isPrivate, setIsPrivate] = useState(false);
   const [repositories, setRepositories] = useState([]);
   const [userStats, setUserStats] = useState(null);
   const [message, setMessage] = useState('');
@@ -14,6 +15,10 @@ function App() {
     if (name === 'username') setUsername(value);
     if (name === 'token') setToken(value);
     if (name === 'repoName') setRepoName(value);
+  };
+
+  const handleCheckboxChange = (event) => {
+    setIsPrivate(event.target.checked);
   };
 
   const handleFormSubmit = (event) => {
@@ -57,7 +62,7 @@ function App() {
         },
         body: JSON.stringify({
           name: repoName,
-          private: false // Set to true if you want to create a private repository
+          private: isPrivate
         })
       });
       if (response.ok) {
@@ -74,21 +79,51 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <h1>Code Nexus</h1>
+        <h1>GitHub Tool</h1>
         <p>Manage your GitHub repositories</p>
       </header>
       <main>
-        <form onSubmit={handleFormSubmit}>
-          <input
-            type="text"
-            name="username"
-            placeholder="Enter GitHub username"
-            value={username}
-            onChange={handleInputChange}
-          />
-          <button type="submit">Get Repositories</button>
-        </form>
-        {message && <p>{message}</p>}
+        <div className="forms-container">
+          <form onSubmit={handleFormSubmit} className="form">
+            <h2>Get Repositories</h2>
+            <input
+              type="text"
+              name="username"
+              placeholder="Enter GitHub username"
+              value={username}
+              onChange={handleInputChange}
+            />
+            <button type="submit">Get Repositories</button>
+          </form>
+          <form onSubmit={handleRepoSubmit} className="form">
+            <h2>Create Repository</h2>
+            <input
+              type="text"
+              name="token"
+              placeholder="Enter GitHub token"
+              value={token}
+              onChange={handleInputChange}
+            />
+            <input
+              type="text"
+              name="repoName"
+              placeholder="Enter new repository name"
+              value={repoName}
+              onChange={handleInputChange}
+            />
+            <label>
+              <input
+                type="checkbox"
+                name="isPrivate"
+                checked={isPrivate}
+                onChange={handleCheckboxChange}
+              />
+              Private Repository
+            </label>
+            <button type="submit">Create Repository</button>
+          </form>
+        </div>
+        {message && <p className="message">{message}</p>}
         {userStats && (
           <div className="user-stats">
             <h2>GitHub User Statistics</h2>
@@ -99,32 +134,20 @@ function App() {
             <p><strong>Following:</strong> {userStats.following}</p>
           </div>
         )}
-        <ul>
-          {repositories.map((repo) => (
-            <li key={repo.id}>
-              <a href={repo.html_url} target="_blank" rel="noopener noreferrer">
-                {repo.name}
-              </a>
-            </li>
-          ))}
-        </ul>
-        <form onSubmit={handleRepoSubmit}>
-          <input
-            type="text"
-            name="token"
-            placeholder="Enter GitHub token"
-            value={token}
-            onChange={handleInputChange}
-          />
-          <input
-            type="text"
-            name="repoName"
-            placeholder="Enter new repository name"
-            value={repoName}
-            onChange={handleInputChange}
-          />
-          <button type="submit">Create Repository</button>
-        </form>
+        {repositories.length > 0 && (
+          <div className="repositories">
+            <h2>Repositories</h2>
+            <ul>
+              {repositories.map((repo) => (
+                <li key={repo.id}>
+                  <a href={repo.html_url} target="_blank" rel="noopener noreferrer">
+                    {repo.name}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
         {username && (
           <div className="github-stats">
             <h2>GitHub Statistics</h2>
