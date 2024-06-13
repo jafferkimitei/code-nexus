@@ -6,7 +6,6 @@ function App() {
   const [token, setToken] = useState('');
   const [repoName, setRepoName] = useState('');
   const [isPrivate, setIsPrivate] = useState(false);
-  const [license, setLicense] = useState('MIT');
   const [includeReadme, setIncludeReadme] = useState(false);
   const [files, setFiles] = useState([]);
   const [releaseTag, setReleaseTag] = useState('');
@@ -79,7 +78,6 @@ function App() {
         body: JSON.stringify({
           name: repoName,
           private: isPrivate,
-          license_template: license,
           auto_init: includeReadme
         })
       });
@@ -194,7 +192,7 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <h1>Cod3 Nexus</h1>
+        <h1>GitHub Tool</h1>
         <p>Manage your GitHub repositories</p>
       </header>
       <main>
@@ -245,16 +243,6 @@ function App() {
               Initialize with README
             </label>
             <label>
-              License:
-              <select name="license" value={license} onChange={handleInputChange}>
-                <option value="MIT">MIT</option>
-                <option value="Apache-2.0">Apache 2.0</option>
-                <option value="GPL-3.0">GPL 3.0</option>
-                <option value="BSD-2-Clause">BSD 2-Clause</option>
-                <option value="BSD-3-Clause">BSD 3-Clause</option>
-              </select>
-            </label>
-            <label>
               Upload Files:
               <input
                 type="file"
@@ -294,7 +282,6 @@ function App() {
             <p><strong>Name:</strong> {userStats.name}</p>
             <p><strong>Public Repositories:</strong> {userStats.public_repos}</p>
             <p><strong>Followers:</strong> {userStats.followers}</p>
-            <p><strong>Followers:</strong> {userStats.followers}</p>
             <p><strong>Following:</strong> {userStats.following}</p>
             <p><strong>Location:</strong> {userStats.location}</p>
           </div>
@@ -318,5 +305,4 @@ function App() {
   );
 }
 
-export default App;
-
+export default App
