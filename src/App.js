@@ -10,19 +10,22 @@ function App() {
   const [files, setFiles] = useState([]);
   const [releaseTag, setReleaseTag] = useState('');
   const [repositories, setRepositories] = useState([]);
+  const [filteredRepositories, setFilteredRepositories] = useState([]);
   const [userStats, setUserStats] = useState(null);
-  const [trophies, setTrophies] = useState([]);
   const [message, setMessage] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [sortOption, setSortOption] = useState('name');
+  const [currentPage, setCurrentPage] = useState(1);
+  const reposPerPage = 5;
 
   useEffect(() => {
     if (username) {
       fetchUserStats();
       fetchRepositories();
-      fetchTrophies();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  
+
   const handleInputChange = (event) => {
     const { name, value } = event.target;
     if (name === 'username') setUsername(value);
@@ -50,7 +53,6 @@ function App() {
     event.preventDefault();
     fetchUserStats();
     fetchRepositories();
-    fetchTrophies();
   };
 
   const handleRepoSubmit = async (event) => {
@@ -63,6 +65,7 @@ function App() {
       const response = await fetch(`https://api.github.com/users/${username}/repos`);
       const data = await response.json();
       setRepositories(data);
+      setFilteredRepositories(data);
     } catch (error) {
       setMessage('Error fetching repositories');
     }
@@ -78,26 +81,6 @@ function App() {
     }
   };
 
-  const fetchTrophies = async () => {
-    try {
-      console.log('Fetching trophies for username:', username);
-      const response = await fetch(`https://github-contributions.vercel.app/api/trophies?username=${username}`);
-      console.log('Response:', response);
-  
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-  
-      const data = await response.json();
-      console.log('Data:', data);
-      setTrophies(data.trophies);
-    } catch (error) {
-      console.error('Error fetching trophies:', error);
-      setMessage('Error fetching trophies');
-    }
-  };
-  
-  
 
   const createRepository = async () => {
     try {
@@ -221,11 +204,49 @@ function App() {
     });
   };
 
+  const handleSearchChange = (event) => {
+    const search = event.target.value;
+    setSearchTerm(search);
+    filterAndSortRepositories(search, sortOption);
+  };
+
+  const handleSortChange = (event) => {
+    const sort = event.target.value;
+    setSortOption(sort);
+    filterAndSortRepositories(searchTerm, sort);
+  };
+
+  const filterAndSortRepositories = (search, sort) => {
+    let filtered = repositories.filter(repo =>
+      repo.name.toLowerCase().includes(search.toLowerCase()) ||
+      (repo.description && repo.description.toLowerCase().includes(search.toLowerCase()))
+    );
+
+    filtered = filtered.sort((a, b) => {
+      if (sort === 'name') {
+        return a.name.localeCompare(b.name);
+      } else if (sort === 'stars') {
+        return b.stargazers_count - a.stargazers_count;
+      } else if (sort === 'created') {
+        return new Date(b.created_at) - new Date(a.created_at);
+      }
+      return 0;
+    });
+
+    setFilteredRepositories(filtered);
+  };
+
+  const indexOfLastRepo = currentPage * reposPerPage;
+  const indexOfFirstRepo = indexOfLastRepo - reposPerPage;
+  const currentRepos = filteredRepositories.slice(indexOfFirstRepo, indexOfLastRepo);
+
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
   return (
     <div className="App">
       <header className="App-header">
-        <h1>GitHub Tool</h1>
-        <p>Manage your GitHub repositories</p>
+        <h1>Cod3 Nexus</h1>
+        <p>Streamline repository management tasks while offering insights into user GitHub profiles and achievements</p>
       </header>
       <main className='main-content'>
         <div className="forms-container">
@@ -279,7 +300,7 @@ function App() {
               <input
                 type="file"
                 name="files"
-                multiple  // Allow multiple files
+                multiple
                 onChange={handleFileChange}
               />
             </label>
@@ -306,6 +327,19 @@ function App() {
             <button type="submit">Create Repository</button>
           </form>
         </div>
+        <div className="repository-controls">
+          <input
+            type="text"
+            placeholder="Search Repositories"
+            value={searchTerm}
+            onChange={handleSearchChange}
+          />
+          <select value={sortOption} onChange={handleSortChange}>
+            <option value="name">Name</option>
+            <option value="stars">Stars</option>
+            <option value="created">Created Date</option>
+          </select>
+        </div>
         {message && <p className="message">{message}</p>}
         {userStats && (
           <div className="github-stats">
@@ -315,39 +349,33 @@ function App() {
             </div>
             <div className="github-stat-item">
               <img src={`https://github-readme-stats.vercel.app/api/top-langs/?username=${username}&layout=compact&theme=radical`} alt="Github stats" />
-              </div>
             </div>
-          )}
-          {trophies.length > 0 && (
-            <div className="github-trophies">
-              <h2>GitHub Trophies</h2>
-              <div className="github-trophy-list">
-                {trophies.map((trophy, index) => (
-                  <div key={index} className="github-trophy">
-                    <img src={trophy} alt={`Trophy ${index}`} />
-                  </div>
-                ))}
-              </div>
+          </div>
+        )}
+        {currentRepos.length > 0 && (
+          <div className="github-repositories">
+            <h2>Repositories</h2>
+            <ul className="repo-list">
+              {currentRepos.map((repo, index) => (
+                <li key={index}>
+                  <a href={repo.html_url} target="_blank" rel="noopener noreferrer">
+                    {repo.name}
+                  </a>
+                </li>
+              ))}
+            </ul>
+            <div className="pagination">
+              {[...Array(Math.ceil(filteredRepositories.length / reposPerPage)).keys()].map(number => (
+                <button key={number + 1} onClick={() => paginate(number + 1)}>
+                  {number + 1}
+                </button>
+              ))}
             </div>
-          )}
-          {repositories.length > 0 && (
-            <div className="github-repositories">
-              <h2>Repositories</h2>
-              <ul className="repo-list">
-                {repositories.map((repo, index) => (
-                  <li key={index}>
-                    <a href={repo.html_url} target="_blank" rel="noopener noreferrer">
-                      {repo.name}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-        </main>
-      </div>
-    );
-  }
-  
-  export default App;
-  
+          </div>
+        )}
+      </main>
+    </div>
+  );
+}
+
+export default App;
