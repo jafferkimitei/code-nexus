@@ -1,4 +1,4 @@
-## CODE NEXUS
+## COD3 NEXUS
 
 Web application that allows users to create Github repositories with predefined settings & templates.
 
