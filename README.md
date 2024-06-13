@@ -3,7 +3,7 @@
 Web application that allows users to create Github repositories with predefined settings & templates.
 
 
-![Landing Page](Codenexus.png)
+![Landing Page](codenexus.png)
 
 ### GitHub API
 Intergrate with GitHub's REST APi to programmatically create repositories using the user's GitHub account
