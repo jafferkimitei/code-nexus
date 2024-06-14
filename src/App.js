@@ -62,7 +62,7 @@ function App() {
 
   const fetchRepositories = async () => {
     try {
-      const response = await fetch(`https://api.github.com/users/${username}/repos`);
+      const response = await fetch(`https://cod3-nexus-api.onrender.com/api/user/${username}/repos`);
       const data = await response.json();
       setRepositories(data);
       setFilteredRepositories(data);
@@ -73,7 +73,7 @@ function App() {
 
   const fetchUserStats = async () => {
     try {
-      const response = await fetch(`https://api.github.com/users/${username}`);
+      const response = await fetch(`https://cod3-nexus-api.onrender.com/api/user/${username}`);
       const data = await response.json();
       setUserStats(data);
     } catch (error) {
@@ -84,19 +84,19 @@ function App() {
 
   const createRepository = async () => {
     try {
-      const response = await fetch(`https://api.github.com/user/repos`, {
+      const response = await fetch(`https://cod3-nexus-api.onrender.com/api/repos`, {
         method: 'POST',
         headers: {
-          'Authorization': `token ${token}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          name: repoName,
-          private: isPrivate,
-          auto_init: includeReadme
+          token: token,
+          repoName: repoName,
+          isPrivate: isPrivate,
+          includeReadme: includeReadme
         })
       });
-
+  
       if (response.ok) {
         const repoData = await response.json();
         if (files.length > 0) {
@@ -122,7 +122,7 @@ function App() {
     const content = await toBase64(file);
 
     try {
-      const response = await fetch(`https://api.github.com/repos/${repoFullName}/contents/${file.name}`, {
+      const response = await fetch(`https://cod3-nexus-api.onrender.com/repos/${repoFullName}/contents/${file.name}`, {
         method: 'PUT',
         headers: {
           'Authorization': `token ${token}`,
@@ -151,7 +151,7 @@ function App() {
     const content = btoa(readmeContent);
 
     try {
-      const response = await fetch(`https://api.github.com/repos/${repoFullName}/contents/README.md`, {
+      const response = await fetch(`https://cod3-nexus-api.onrender.com/repos/${repoFullName}/contents/README.md`, {
         method: 'PUT',
         headers: {
           'Authorization': `token ${token}`,
@@ -174,7 +174,7 @@ function App() {
 
   const markRelease = async (repoFullName) => {
     try {
-      const response = await fetch(`https://api.github.com/repos/${repoFullName}/releases`, {
+      const response = await fetch(`https://cod3-nexus-api.onrender.com/repos/${repoFullName}/releases`, {
         method: 'POST',
         headers: {
           'Authorization': `token ${token}`,
